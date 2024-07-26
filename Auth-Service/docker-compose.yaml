@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    container_name: auth_service 
+    build: ./
+    ports:
+      - "8082:8082"
+    networks:
+      - global-network
+
+# Docker Networks
+networks:
+  global-network:
+    external: true
