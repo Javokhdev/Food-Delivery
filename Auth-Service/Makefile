@@ -2,7 +2,7 @@ CURRENT_DIR=$(shell pwd)
 DBURL=postgres://postgres:root@localhost:5432/learning_db?sslmode=disable
 
 proto-gen:
-	./scripts/script/gen-proto.sh ${CURRENT_DIR}
+	./scripts/gen-proto.sh ${CURRENT_DIR}
 
 mig-up:
 	migrate -path migrations -database '$(DBURL)' -verbose up
@@ -15,15 +15,6 @@ mig-create:
 
 mig-insert:
 	migrate create -ext sql -dir migrations -seq insert_table
-
-SWAGGER := ~/go/bin/swag
-SWAGGER_DOCS := docs
-SWAGGER_INIT := $(SWAGGER) init -g ./api/api.go -o $(SWAGGER_DOCS)
-
-# Target to generate swagger documentation
-swag-gen:
-	$(SWAGGER_INIT)
-
 
 gen-proto:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -57,17 +48,3 @@ doc-continer-all-del:
 
 doc-network-all:
 	docker network ls
-
-
-# doc-query:
-# 	docker ps
-# 	docker image rmi -f auth_service
-# 	docker container ls
-# 	docker container prune
-# 	docker container rm libCont
-# 	docker build -t lib_service .
-# 	docker network ls
-# 	docker images
-# 	docker exec -it post-cont psql -U postgres -d library_db
-# 	docker system prune -af
-#  	docker volume prune -af

@@ -13,5 +13,5 @@ COPY --from=builder /app/config/model.conf ./config
 COPY --from=builder /app/config/policy.csv ./config
 
 COPY .env .
-EXPOSE 8082
+EXPOSE 8085
 CMD ["./myapp"]
