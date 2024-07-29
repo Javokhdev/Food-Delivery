@@ -1,0 +1,3 @@
+[submodule "food-delivery-submodule"]
+    path = food-delivery-submodule
+    url = git@github.com:Javokhdev/food-delivery-submodule.git
