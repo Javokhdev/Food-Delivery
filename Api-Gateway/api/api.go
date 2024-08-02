@@ -1,20 +1,22 @@
 package api
 
 import (
-	"auth/api/handler"
-	_ "auth/docs"
+	"api-gateway/api/handler"
 
 	"github.com/gin-gonic/gin"
 	files "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "api-gateway/docs"
 )
 
-// @title Auth Service
-// @description Auth service API documentation
+// @tite Voting service
+// @version 1.0
+// @description Voting service
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header
-// @name Authorization
+// @name Authourization
 func NewGin(h *handler.Handler) *gin.Engine {
 	// ca, err := casbin.NewEnforcer("config/model.conf", "config/policy.csv")
 	// if err != nil {
@@ -29,25 +31,67 @@ func NewGin(h *handler.Handler) *gin.Engine {
 
 	r := gin.Default()
 
-	//r.Use(middleware.NewAuth(ca))
+	// r.Group("/")
+	// router.Use(middleware.NewAuth(ca))
+
 	url := ginSwagger.URL("swagger/doc.json")
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(files.Handler, url))
 
-	a := r.Group("/auth")
-	{
-		a.POST("/register", h.Register)
-		a.POST("/login", h.Login)
-		a.POST("/logout", h.Logout)
-		a.POST("/forgot-password", h.ForgotPassword)
-		a.POST("/reset-password", h.ResetPassword)
-	}
+	c := r.Group("/topic")
+	c.POST("/create", h.CreateLearningTopic)
+	c.GET("/topics", h.GetLearningTopics)
+	c.PUT("/update/:id", h.UpdateLearningTopic)
+	c.DELETE("/delete/:id", h.DeleteLearningTopic)
+	c.POST("/completed", h.CompletedTopics)
+	c.GET("/getcompleted", h.GetCompletedTopics)
 
-	u := r.Group("/user")
-	{
-		u.GET("/profile", h.GetProfile)
-		u.PUT("/profile", h.UpdateProfile)
-		u.PUT("/password", h.ChangePassword)
-	}
+	q := r.Group("/quiz")
+	q.POST("/create", h.CreateQuiz)
+	q.GET("/quizzes", h.GetQuiz)
+	q.PUT("/update/:id", h.UpdateQuiz)
+	q.DELETE("/delete/:id", h.DeleteQuiz)
+	q.POST("/submit", h.SubmitQuiz)
+
+	rs := r.Group("/extra_resources")
+	rs.POST("/create", h.CreateExtraResourses)
+	rs.GET("/get", h.GetExtraResourses)
+	rs.PUT("/update/:id", h.UpdateExtraResourses)
+	rs.DELETE("/delete/:id", h.DeleteExtraResourses)
+	rs.POST("/completed", h.CompletedExtraResources)
+
+	ps := r.Group("/progress")
+	ps.GET("/get", h.GetLearningProgress)
+
+	rn := r.Group("/recommendations")
+	rn.POST("/create", h.CreateLearningRecommendations)
+	rn.GET("/get", h.GetLearningRecommendations)
+
+	f := r.Group("/feedback")
+	f.POST("/create", h.CreateLearningFeedback)
+	f.GET("/get", h.GetLearningFeedback)
+
+	hw := r.Group("/homeworks")
+	hw.POST("/create", h.CreateLearningHomeworks)
+	hw.GET("/get", h.GetLearningHomeworks)
+	hw.POST("/submit", h.SubmitHomework)
+
+	l := r.Group("/level")
+	l.POST("/create", h.CreateGameLevel)
+	l.GET("/get", h.GetGameLevels)
+	l.PUT("/update", h.UpdateGameLevel)
+	l.DELETE("/delete/:id", h.DeleteGameLevel)
+	l.POST("/begin", h.BeginGameLevel)
+	l.POST("/complete", h.CompleteGameLevel)
+
+	ch := r.Group("/challenge")
+	ch.POST("/create", h.CreateGameChallenge)
+	ch.GET("/get/:id", h.GetGameChallenge)
+	ch.PUT("/update/", h.UpdateGameChallenge)
+	ch.DELETE("/delete/:id", h.DeleteGameChallenge)
+	ch.POST("/submit", h.SubmitChallenge)
+
+	g := r.Group("/game")
+	g.GET("/leaderboard", h.GetGameLeaderboard)
 
 	return r
 }

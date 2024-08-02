@@ -1,21 +1,24 @@
 package handler
 
 import (
-	pb "auth/genproto/auth"
-	pbu "auth/genproto/user"
+	pb "api-gateway/genproto/game"
+	pbl "api-gateway/genproto/learning"
+	pbu "api-gateway/genproto/user"
+	"api-gateway/kafka"
 )
 
 type Handler struct {
-	Auth  pb.AuthServiceClient
-	User  pbu.UserServiceClient
-	Redis InMemoryStorageI
+	Learning pbl.LearningServiceClient
+	Game     pb.GameServiceClient
+	User     pbu.UserServiceClient
+	Kaf      kafka.KafkaProducer
 }
 
-func NewHandler(auth pb.AuthServiceClient, user pbu.UserServiceClient, redis InMemoryStorageI) *Handler {
+func NewHandler(learn pbl.LearningServiceClient, game pb.GameServiceClient, user pbu.UserServiceClient, kaff kafka.KafkaProducer) *Handler {
 	return &Handler{
-		Auth:  auth,
-		User:  user,
-		Redis: redis,
+		Learning: learn,
+		Game:     game,
+		User:     user,
+        Kaf:      kaff,
 	}
-
 }

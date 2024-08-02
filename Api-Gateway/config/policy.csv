@@ -1,0 +1,67 @@
+p, unauthorized, /swagger/index.html, GET
+p, unauthorized, /swagger/swagger-ui.css, GET
+p, unauthorized, /swagger/swagger-ui-bundle.js, GET
+p, unauthorized, /swagger/favicon-32x32.png, GET
+p, unauthorized, /swagger/favicon-16x16.png, GET
+p, unauthorized, /swagger/swagger-ui-standalone-preset.js, GET
+p, unauthorized, /swagger/swagger/doc.json, GET
+
+
+p, unauthorized, /user/login, POST
+p, unauthorized, /user/register, POST
+p, unauthorized, /user/logout, DELETE
+p, unauthorized, /user/refresh_token, GET
+
+p, admin, /user/getbyid/:id, GET
+
+p, user, /user/update/:id, PUT
+p, user, /user/changepassword/:id, PUT
+p, user, /user/reset_password/:id, PUT
+p, user, /user/password-recovery/:id, POST
+
+
+p, user, /topic/create, POST
+p, user, /topic/topics, GET
+p, user, /topic/update/:id, PUT
+p, user, /topic/delete/:id, DELETE
+p, user, /topic/getcompleted, GET
+
+p, user, /quiz/create, POST
+p, user, /quiz/quizzes, GET
+p, user, /quiz/update/:id, PUT
+p, user, /quiz/delete/:id, DELETE
+p, user, /quiz/submit, POST
+
+p, user, /resources/create, POST
+p, user, /resources/resources, GET
+p, user, /resources/update/:id, PUT
+p, user, /resources/delete/:id, DELETE
+p, user, /resources/getcompleted, GET
+
+p, user, /progress, GET 
+
+p, user, /recommendations/create, POST
+p, user, /recommendations/recommendations, GET
+
+p, user, /feedback/create, POST
+p, user, /feedback/feedback, GET
+
+p, user, /homeworks/create, POST
+p, user, /homeworks/homeworks, GET
+p, user, /homeworks/submit, POST
+
+p, user, /level/create, POST
+p, user, /level/get, GET
+p, user, /level/update/:id, PUT
+p, user, /level/delete, DELETE
+p, user, /level/begin, POST
+p, user, /level/complete, POST
+
+p, user, /challenge/create, POST
+p, user, /challenge/get, GET
+p, user, /challenge/update/:id, PUT
+p, user, /challenge/delete, DELETE
+p, user, /challenge/submit, POST
+
+p, user, /game/get, GET
+

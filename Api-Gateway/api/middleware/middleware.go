@@ -7,12 +7,11 @@ import (
 
 	"log"
 
-	"auth/api/token"
-	"auth/config"
-
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"api-gateway/api/token"
+	"api-gateway/config"
 )
 
 type JwtRoleAuth struct {
@@ -27,7 +26,8 @@ func NewAuth(enforce *casbin.Enforcer) gin.HandlerFunc {
 	}
 
 	return func(ctx *gin.Context) {
-		allow, err := auth.CheckPermission(ctx)
+		path := ctx.FullPath()
+		allow, err := auth.CheckPermission(ctx.Request, path)
 		if err != nil {
 			valid, _ := err.(jwt.ValidationError)
 			if valid.Errors == jwt.ValidationErrorExpired {
@@ -44,13 +44,13 @@ func NewAuth(enforce *casbin.Enforcer) gin.HandlerFunc {
 
 }
 
-func (a *JwtRoleAuth) GetRole(r *gin.Context) (string, error) {
+func (a *JwtRoleAuth) GetRole(r *http.Request) (string, error) {
 	var (
 		claims jwt.MapClaims
 		err    error
 	)
 
-	jwtToken := r.Request.Header.Get("Authourization")
+	jwtToken := r.Header.Get("Authourization")
 
 	if jwtToken == "" {
 		return "unauthorized", nil
@@ -69,14 +69,13 @@ func (a *JwtRoleAuth) GetRole(r *gin.Context) (string, error) {
 	return claims["role"].(string), nil
 }
 
-func (a *JwtRoleAuth) CheckPermission(r *gin.Context) (bool, error) {
+func (a *JwtRoleAuth) CheckPermission(r *http.Request, path string) (bool, error) {
 	role, err := a.GetRole(r)
 	if err != nil {
 		log.Println("Error while getting role from token: ", err)
 		return false, err
 	}
-	method := r.Request.Method
-	path := r.Request.URL.Path
+	method := r.Method
 	allowed, err := a.enforcer.Enforce(role, path, method)
 	if err != nil {
 		log.Println("Error while comparing role from csv list: ", err)

@@ -1,16 +1,14 @@
 package token
 
 import (
-	"errors"
 	"log"
 	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
-	"auth/config"
-	pb "auth/genproto/auth"
-
+	"api-gateway/config"
+	pb "api-gateway/genproto/auth"
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/cast"
 )
@@ -40,7 +38,7 @@ func GenereteJWTToken(user *pb.RegisterRequest) *Tokens {
 	claims["username"] = user.Username
 	claims["password"] = user.Password
 	claims["email"] = user.Email
-	claims["role"] = user.Role
+	claims["role"]=user.Role
 	claims["iat"] = time.Now().Unix()
 	claims["exp"] = time.Now().Add(60 * time.Minute).Unix()
 	access, err := accessToken.SignedString([]byte(tokenKey))
@@ -51,7 +49,7 @@ func GenereteJWTToken(user *pb.RegisterRequest) *Tokens {
 	rftclaims["username"] = user.Username
 	rftclaims["password"] = user.Password
 	rftclaims["email"] = user.Email
-	rftclaims["role"] = user.Role
+	rftclaims["role"]=user.Role
 	rftclaims["iat"] = time.Now().Unix()
 	rftclaims["exp"] = time.Now().Add(24 * time.Hour).Unix()
 	refresh, err := refreshToken.SignedString([]byte(tokenKey))
@@ -65,14 +63,14 @@ func GenereteJWTToken(user *pb.RegisterRequest) *Tokens {
 	}
 }
 
-func ExtractClaim(tokenStr string) (jwt.MapClaims, error) {
+func ExtractClaim(cfg *config.Config, tokenStr string) (jwt.MapClaims, error) {
 	var (
 		token *jwt.Token
 		err   error
 	)
 
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Load().TokenKey), nil
+		return []byte(cfg.TokenKey), nil
 	}
 	token, err = jwt.Parse(tokenStr, keyFunc)
 	if err != nil {
@@ -117,31 +115,10 @@ func GetIdFromToken(r *http.Request, cfg *config.Config) (string, int) {
 		softToken = token
 	}
 
-	claims, err := ExtractClaim(softToken)
+	claims, err := ExtractClaim(cfg, softToken)
 	if err != nil {
 		return "unauthorized", http.StatusUnauthorized
 	}
 
 	return cast.ToString(claims["username"]), 0
-}
-
-func ExtractUserIDFromToken(tokenString string, secretKey string) (string, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("unexpected signing method")
-		}
-		return []byte(secretKey), nil
-	})
-
-	if err != nil {
-		return "", err
-	}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if userID, ok := claims["user_id"].(string); ok {
-			return userID, nil
-		}
-	}
-
-	return "", errors.New("invalid token")
 }
